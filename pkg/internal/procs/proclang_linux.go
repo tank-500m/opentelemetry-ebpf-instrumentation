@@ -122,14 +122,14 @@ func collectSymbols(f *elf.File, syms []elf.Symbol, symbolNames []string, addres
 func FindExeSymbols(f *elf.File, symbolNames []string, types ...elf.SymType) (map[string]Sym, error) {
 	addresses := map[string]Sym{}
 
-	syms, err := f.Symbols()
+	syms, err := lookupSymbols(f, elf.SHT_SYMTAB, symbolNames)
 	if err != nil && !errors.Is(err, elf.ErrNoSymbols) {
 		return nil, err
 	}
 
 	collectSymbols(f, syms, symbolNames, addresses, types...)
 
-	dynsyms, err := f.DynamicSymbols()
+	dynsyms, err := lookupSymbols(f, elf.SHT_DYNSYM, symbolNames)
 	if err != nil && !errors.Is(err, elf.ErrNoSymbols) {
 		return nil, err
 	}
